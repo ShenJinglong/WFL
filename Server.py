@@ -29,7 +29,7 @@ def random_select():
     return sche_sig, a
 
 def get_uplink_delay(received_power):
-    I = np.random.random((params.RB_NUM,1))
+    I = np.random.uniform(1e-4, 0.01, size=(params.RB_NUM,1))
     SINR = received_power / (I + params.UPLINK_BANDWIDTH * params.NOISE_POWER_SPECTRAL_DENSITY)
     rate = params.UPLINK_BANDWIDTH * np.log2(1 + SINR)
     delay = params.MODEL_SIZE / rate
@@ -116,6 +116,12 @@ def random_RB_schedual(msg, user_sche):
             user_delay.append(0)
     return RB_sche, user_delay, max(user_delay)
 
+def draw_circle(ax):
+    thetas = np.linspace(0, np.math.pi*2, 200)
+    x = 100 * np.cos(thetas)
+    y = 100 * np.sin(thetas)
+    ax.plot(x, y)
+
 class Server():
     def __init__(self) -> None:
         pass
@@ -133,7 +139,12 @@ class Server():
         uplink_delay_recorder = []
 
         # plt.figure(figsize=(8, 6), dpi=80)
-        f, (ax1, ax2, ax3) = plt.subplots(3, 1)
+        f, axes = plt.subplots(3, 2)
+        for ax in axes[:, 0]:
+            ax.remove()
+        axes = axes[:, 1]
+        gs = axes[0].get_gridspec()
+        axbig = f.add_subplot(gs[:, 0])
         plt.ion()
         
         for iter in range(params.ITERATION_NUM):
@@ -167,23 +178,34 @@ class Server():
             acc_recorder.append(eval_result[1])
             iter_recorder.append(iter)
             uplink_delay_recorder.append(iter_delay)
+            user_position_recorder = []
+            for i in range(params.CLIENT_NUM):
+                user_position_recorder.append(msg[i]['position'])
 
-            ax1.clear()            
-            ax1.set_xlim(0, params.ITERATION_NUM)
-            ax1.set_ylim(0, 1)
-            ax1.plot(iter_recorder, acc_recorder, label='acc')
-            ax1.legend()
-            ax2.clear()
-            ax2.set_xlim(0, params.ITERATION_NUM)
-            ax2.set_ylim(0, 3)        
-            ax2.plot(iter_recorder, loss_recorder, label='loss')
-            ax2.legend()
-            ax3.clear()
-            ax3.set_xlim(0, params.ITERATION_NUM)
-            ax3.plot(iter_recorder, uplink_delay_recorder, label='uplink delay')
-            ax3.plot([0, params.ITERATION_NUM], [np.mean(uplink_delay_recorder)]*2, label='mean value')
-            ax3.text(int(params.ITERATION_NUM / 2), np.mean(uplink_delay_recorder) + 2, f'{np.mean(uplink_delay_recorder):.2f}')
-            ax3.legend()
+            axes[0].clear()            
+            axes[0].set_xlim(0, params.ITERATION_NUM)
+            axes[0].set_ylim(0, 1)
+            axes[0].plot(iter_recorder, acc_recorder, label='acc')
+            axes[0].legend()
+            axes[1].clear()
+            axes[1].set_xlim(0, params.ITERATION_NUM)
+            axes[1].set_ylim(0, 3)        
+            axes[1].plot(iter_recorder, loss_recorder, label='loss')
+            axes[1].legend()
+            axes[2].clear()
+            axes[2].set_xlim(0, params.ITERATION_NUM)
+            axes[2].plot(iter_recorder, uplink_delay_recorder, label='uplink delay')
+            axes[2].plot([0, params.ITERATION_NUM], [np.mean(uplink_delay_recorder)]*2, label='mean value')
+            axes[2].text(int(params.ITERATION_NUM / 2), np.mean(uplink_delay_recorder) + 2, f'{np.mean(uplink_delay_recorder):.2f}')
+            axes[2].legend()
+            axbig.clear()
+            axbig.axis('equal')
+            draw_circle(axbig)
+            for i, p in enumerate(user_position_recorder):
+                axbig.scatter(p[0], p[1])
+                if i in a:
+                    axbig.plot([0, p[0]], [0, p[1]])
+                
             plt.pause(0.0001)
 
         plt.ioff()

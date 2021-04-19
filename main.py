@@ -34,13 +34,16 @@ if __name__ == '__main__':
     edr.close()
     elr.close()
 
+    np.random.seed(4)
     server_p = mp.Process(target=server.run, args=(edata, elabel))
     clients_p = []
     local_data_size = int(np.floor(params.DATASET_SIZE_USED_TO_TRAIN / params.CLIENT_NUM))
     for i, client in enumerate(clients):
         clients_p.append(mp.Process(target=client.run, args=(
             data[i*local_data_size:(i+1)*local_data_size, :, :, :], 
-            label[i*local_data_size:(i+1)*local_data_size]
+            label[i*local_data_size:(i+1)*local_data_size],
+            [[np.random.uniform(0, 100), np.random.uniform(0, 2*np.math.pi)],
+             [np.random.uniform(3, 5), np.random.uniform(0, 2*np.math.pi)]]
         )))
     
     server_p.start()
