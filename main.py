@@ -8,6 +8,20 @@ from Server import Server
 from MNIST.MNISTReader import MNISTImageReader as ds_r
 from MNIST.MNISTReader import MNISTLabelReader as lb_r
 
+def classify_dataset(data, label):
+    d = [[], [], [], [], [], [], [], [], [], []]
+    print(d)
+    print(data.shape)
+    print(label.shape)
+
+    for i in range(60000):
+        d[label[i]].append(data[i, :, :, :])
+
+    for i in range(10):
+        d[i] = np.array(d[i])
+
+    return d
+
 if __name__ == '__main__':
     server = Server()
     clients = []
@@ -34,7 +48,7 @@ if __name__ == '__main__':
     edr.close()
     elr.close()
 
-    np.random.seed(4)
+    np.random.seed(2)
     server_p = mp.Process(target=server.run, args=(edata, elabel))
     clients_p = []
     local_data_size = int(np.floor(params.DATASET_SIZE_USED_TO_TRAIN / params.CLIENT_NUM))
@@ -45,7 +59,19 @@ if __name__ == '__main__':
             [[np.random.uniform(0, 100), np.random.uniform(0, 2*np.math.pi)],
              [np.random.uniform(3, 5), np.random.uniform(0, 2*np.math.pi)]]
         )))
-    
+
+    # result = classify_dataset(data, label)
+    # np.random.seed(4)
+    # server_p = mp.Process(target=server.run, args=(edata, elabel))
+    # clients_p = []
+    # for i, client in enumerate(clients):
+    #     clients_p.append(mp.Process(target=client.run, args=(
+    #         result[i], 
+    #         i * np.ones((len(result[i]),), dtype=np.uint8),
+    #         [[np.random.uniform(0, 100), np.random.uniform(0, 2*np.math.pi)],
+    #          [np.random.uniform(3, 5), np.random.uniform(0, 2*np.math.pi)]]
+    #     )))
+
     server_p.start()
     for client_p in clients_p:
         client_p.start()

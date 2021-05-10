@@ -13,8 +13,8 @@ MNIST_TRAIN_LABELS_PATH = './MNIST/train-labels.idx1-ubyte' # mnist 训练标签
 MNIST_EVAL_IMAGES_PATH = './MNIST/t10k-images.idx3-ubyte' # mnist eval数据集路径
 MNIST_EVAL_LABELS_PATH = './MNIST/t10k-labels.idx1-ubyte' # mnist eval标签路径
 
-UPLINK_BANDWIDTH = 1 * 1e3 * 1e3 # 上行链路带宽
+UPLINK_BANDWIDTH = 50 * 1e3 * 1e3 # 上行链路带宽
 CLIENT_TRANSMIT_POWER = 1 # 用户发送功率
-NOISE_POWER_SPECTRAL_DENSITY = 10**(-14.4) # 噪声功率谱密度
-MODEL_SIZE = 1024 * 1024 / 2 # 模型大小
-PATHLOSS_FACTOR = 3.7 # 路损因子
+NOISE_POWER_SPECTRAL_DENSITY = 10**(-10) # 噪声功率谱密度
+MODEL_SIZE = 1024 * 1024 * 3 # 模型大小
+PATHLOSS_FACTOR = 2 # 路损因子
