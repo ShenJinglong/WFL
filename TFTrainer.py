@@ -42,3 +42,6 @@ class TFTrainer(Trainer):
 
     def get_weights(self):
         return self.__model.get_weights()
+
+if __name__ == '__main__':
+    r = TFTrainer()
